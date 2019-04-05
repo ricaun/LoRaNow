@@ -1,21 +1,21 @@
 /*
-  LoRaNow Simple Gateway with ESP8266
+  LoRaNow Simple Gateway with ESP32
 
   This code creates a webServer to show the LoRa messages.
   
-  created 03 04 2019
+  created 05 04 2019
   by Luiz H. Cassettari
 */
 
 #include <LoRaNow.h>
-#include <ESP8266WiFi.h>
-#include <ESP8266WebServer.h>
+#include <WiFi.h>
+#include <WebServer.h>
 #include <StreamString.h>
 
 const char *ssid = "";
 const char *password = "";
 
-ESP8266WebServer server(80);
+WebServer server(80);
 
 const char *script = "<script>function loop() {var resp = GET_NOW('loranow'); var area = document.getElementById('area').value; document.getElementById('area').value = area + resp; setTimeout('loop()', 1000);} function GET_NOW(get) { var xmlhttp; if (window.XMLHttpRequest) xmlhttp = new XMLHttpRequest(); else xmlhttp = new ActiveXObject('Microsoft.XMLHTTP'); xmlhttp.open('GET', get, false); xmlhttp.send(); return xmlhttp.responseText; }</script>";
 
@@ -24,7 +24,7 @@ void handleRoot()
   String str = "";
   str += "<html>";
   str += "<head>";
-  str += "<title>ESP8266 - LoRaNow</title>";
+  str += "<title>ESP32 - LoRaNow</title>";
   str += "<meta name='viewport' content='width=device-width, initial-scale=1'>";
   str += script;
   str += "</head>";

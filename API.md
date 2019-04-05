@@ -151,6 +151,8 @@ unsigned long id = LoRaNow.id();
 LoRaNow.setId(id);
 ```
 
+* `id` - identification number (4 bytes)
+
 ### Count
 
 The count number, always increment by one when a message is send.
@@ -158,8 +160,6 @@ The count number, always increment by one when a message is send.
 ```c
 byte count = LoRaNow.count();
 ```
-
- * `id` - identification number (4 bytes)
  
 ### Gateway
 

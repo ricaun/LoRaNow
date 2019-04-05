@@ -29,10 +29,6 @@
 #ifndef SIGRD
 #define SIGRD 5
 #endif
-#elif defined(ARDUINO_ARCH_ESP8266)
-#include <ESP8266WiFi.h>
-#elif defined(ARDUINO_ARCH_ESP32)
-#include "WiFi.h"
 #endif
 
 LoRaNowClass::LoRaNowClass()
@@ -258,15 +254,10 @@ uint32_t LoRaNowClass::makeId()
       (uint32_t)boot_signature_byte_get(0x16) << 8 |
       (uint32_t)boot_signature_byte_get(0x17);
   return _id;
-#elif (defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32))
-  uint8_t mac[6];
-  WiFi.macAddress(mac);
-  uint32_t _id =
-      (uint32_t)mac[0] << 24 |
-      (uint32_t)mac[1] << 16 |
-      (uint32_t)mac[4] << 8 |
-      (uint32_t)mac[5];
-  return _id;
+#elif defined(ARDUINO_ARCH_ESP8266)
+  return ESP.getChipId();
+#elif defined(ARDUINO_ARCH_ESP32)
+  return ESP.getEfuseMac();
 #endif
   return 0;
 }

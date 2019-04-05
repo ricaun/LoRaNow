@@ -49,7 +49,7 @@ This is the payload format.
 ## Installation
 
 * Install the library by [Using the Library Manager](https://www.arduino.cc/en/Guide/Libraries#toc3)
-* **OR** by [Importing the .zip library](https://www.arduino.cc/en/Guide/Libraries#toc4) using either the [master](https://github.com/ricaun/LoRaNow/archive/1.0.0.zip) or one of the [releases](https://github.com/ricaun/LoRaNow/releases) ZIP files.
+* **OR** by [Importing the .zip library](https://www.arduino.cc/en/Guide/Libraries#toc4) using either the [master](https://github.com/ricaun/LoRaNow/archive/1.0.1.zip) or one of the [releases](https://github.com/ricaun/LoRaNow/releases) ZIP files.
 
 ## Examples
 
@@ -66,7 +66,7 @@ This libary is [licensed](LICENSE) under the [MIT Licence](https://en.wikipedia.
 ## To do
 
 - [x] Example for ESP8266 board
-- [ ] Example for ESP32 board
+- [x] Example for ESP32 board
 - [ ] Improve documentation
 - [ ] State machine
 
