@@ -494,6 +494,11 @@ void LoRaNowClass::txMode()
   LoRa.idle();
   LoRa.setFrequency(frequency);
   LoRa.setSpreadingFactor(sf);
+  LoRa.setSignalBandwidth(125E3);
+  LoRa.setCodingRate4(5);
+  LoRa.setPreambleLength(8);
+  LoRa.setSyncWord(0x12);
+  LoRa.disableCrc();
 
   if (LoRaNow._gateway == true)
     LoRa.enableInvertIQ();
