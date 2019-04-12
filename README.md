@@ -10,15 +10,17 @@ The main focus hardware is Arduino and ESP boards with [RFM95W](http://www.hoper
 
 ### RFM95W
 
-| RFM95W | Arduino | ESP8266 |
-| :----: | :-----: | :-----: |
-| VCC | 3.3V | 3.3V |
-| GND | GND | GND |
-| SCK | SCK | SCK |
-| MISO | MISO | MISO |
-| MOSI | MOSI | MOSI |
-| SS | 10 | gpio16 |
-| DIO0 | 2 | gpio15 |
+The default pinout connection is like the table below.
+
+| RFM95W | Arduino | ESP8266 | ESP32 |
+| :----: | :-----: | :-----: | :-----: |
+| VCC | 3.3V | 3.3V | 3.3V |
+| GND | GND | GND | GND |
+| SCK | SCK | SCK | SCK |
+| MISO | MISO | MISO | MISO |
+| MOSI | MOSI | MOSI | MOSI |
+| SS | 10 | gpio16 | gpio18 |
+| DIO0 | 2 | gpio15 | gpio26 |
 
 
 `SS`, and `DIO0` pins can be changed by using `LoRaNow.setPins(ss, dio0)`. `DIO0` pin is needed, it **must** be interrupt capable via [`attachInterrupt(...)`](https://www.arduino.cc/en/Reference/AttachInterrupt).
@@ -36,7 +38,7 @@ You can select the frequency using `LoRaNow.setFrequency(frequency)` or you can 
 
 # Protocol Payload
 
-This is the payload format.
+This is the payload format, this protocol don't have any kind of encryption.
 
 | Protocol | Device ID | Count | Length | CheckSum | Payload |
 | :-------: | :------: | :------:| :------:| :------:| :------:|
