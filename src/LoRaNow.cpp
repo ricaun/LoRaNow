@@ -1,6 +1,7 @@
 // ---------------------------------------------------- //
 // LoRaNow.cpp
 // ---------------------------------------------------- //
+// 20/04/2019 - Fix esp32 id
 // 03/04/2019 - First version release
 // 02/04/2019 - Add boards pinout
 // 01/04/2019 - Clear exemple
@@ -257,7 +258,8 @@ uint32_t LoRaNowClass::makeId()
 #elif defined(ARDUINO_ARCH_ESP8266)
   return ESP.getChipId();
 #elif defined(ARDUINO_ARCH_ESP32)
-  return ESP.getEfuseMac();
+  uint32_t _id = (uint32_t) ((uint64_t)ESP.getEfuseMac()>>16);
+  return ((((_id) & 0xff000000) >> 24) | (((_id) & 0x00ff0000) >>  8) | (((_id) & 0x0000ff00) << 8) | (((_id) & 0x000000ff) << 24)); // swap bits
 #endif
   return 0;
 }
