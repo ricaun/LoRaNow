@@ -16,6 +16,7 @@ LoRaNowLayer KEYWORD1
 setId	KEYWORD2
 id	KEYWORD2
 gateway	KEYWORD2
+count	KEYWORD2
 
 begin	KEYWORD2
 end	KEYWORD2
@@ -25,6 +26,9 @@ isReady	KEYWORD2
 delay	KEYWORD2
 
 showStatus	KEYWORD2
+
+onMessage	KEYWORD2
+onSleep	KEYWORD2
 
 beginPacket	KEYWORD2
 endPacket	KEYWORD2

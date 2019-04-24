@@ -75,6 +75,8 @@ LoRaNow.send();
 
 #### Register callback
 
+### onMessege
+
 Register a callback function for when a valid payload is received.
 
 ```c
@@ -87,26 +89,31 @@ void onMessage(uint8_t *buffer, size_t size) {
 
  * `onMessage` - function to call when a valid payload is received.
 
+### onSleep
+
+Register a callback function for when a the protocol is on sleep mode.
+
+```c
+LoRaNow.onSleep(onSleep);
+
+void onSleep() {
+ // ...
+}
+```
+
+ * `onSleep` - function to call when a protocol is on sleep mode.
+
 ## State machine
 
 ### Loop
 
-This function need to be on the loop to work properly
+This function need to be on the loop to work properly 
+ * This function uses `millis()`
+ * All callback is called by `LoRaNow.loop()`
 
 ```c
 LoRaNow.loop();
 ```
-
-### Is sleep
-
-Function used on the loop to detect when the protocol is on sleep mode.
-
-```c
-if (LoRaNow.isSleep()) {
-  ...
-}
-```
-Returns true when the protocol is on the sleep mode.
 
 ## Radio parameters
 

@@ -48,17 +48,20 @@ void handleLoRaNow()
   }
 }
 
-void setup(void) {
+void setup(void)
+{
 
   Serial.begin(115200);
 
   WiFi.mode(WIFI_STA);
-  if (ssid != "") WiFi.begin(ssid, password);
+  if (ssid != "")
+    WiFi.begin(ssid, password);
   WiFi.begin();
   Serial.println("");
 
   // Wait for connection
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print(".");
   }
@@ -83,16 +86,19 @@ void setup(void) {
   // LoRaNow.setSpreadingFactor(sf);
   // LoRaNow.setPins(ss, dio0);
 
-  if (!LoRaNow.begin()) {
+  if (!LoRaNow.begin())
+  {
     Serial.println("LoRa init failed. Check your connections.");
-    while (true);
+    while (true)
+      ;
   }
 
   LoRaNow.onMessage(onMessage);
   LoRaNow.gateway();
 }
 
-void loop(void) {
+void loop(void)
+{
   LoRaNow.loop();
   server.handleClient();
 }
@@ -110,6 +116,14 @@ void onMessage(uint8_t *buffer, size_t size)
   Serial.write(buffer, size);
   Serial.println();
   Serial.println();
+
+  if (string.available() > 512)
+  {
+    while (string.available())
+    {
+      string.read();
+    }
+  }
 
   string.print("Node Id: ");
   string.println(id, HEX);

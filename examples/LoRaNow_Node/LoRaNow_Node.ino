@@ -28,19 +28,12 @@ void setup() {
   }
 
   LoRaNow.onMessage(onMessage);
+  LoRaNow.onSleep(onSleep);
   LoRaNow.showStatus(Serial);
 }
 
 void loop() {
   LoRaNow.loop();
-  if (LoRaNow.isSleep())
-  {
-    Serial.println("Send Message");
-    
-    LoRaNow.print("LoRaNow Node Message ");
-    LoRaNow.print(millis());
-    LoRaNow.send();
-  }
 }
 
 void onMessage(uint8_t *buffer, size_t size)
@@ -49,4 +42,14 @@ void onMessage(uint8_t *buffer, size_t size)
   Serial.write(buffer, size);
   Serial.println();
   Serial.println();
+}
+
+void onSleep()
+{
+  Serial.println("Sleep");
+  delay(5000); // "kind of a sleep"
+  Serial.println("Send Message");
+  LoRaNow.print("LoRaNow Node Message ");
+  LoRaNow.print(millis());
+  LoRaNow.send();
 }

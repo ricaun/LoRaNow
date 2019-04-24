@@ -1,6 +1,8 @@
 // ---------------------------------------------------- //
 // LoRaNow.cpp
 // ---------------------------------------------------- //
+// 23/04/2019 - Add onSleep callback
+// 22/04/2019 - Add LORA_STATE_RECEIVE on loop - fix interrupt reset on esp32/esp8266
 // 20/04/2019 - Fix esp32 id
 // 03/04/2019 - First version release
 // 02/04/2019 - Add boards pinout
@@ -60,8 +62,7 @@ byte LoRaNowClass::begin()
     LORANOW_DEBUG_PRINTLN("[ln] Begin");
     LoRa.onReceive(LoRaNowClass::onReceive);
     LoRa.onTxDone(LoRaNowClass::onTxDone);
-    LoRa.sleep();
-    state = LORA_STATE_SLEEP;
+    sleep();
     return 1;
   }
   return 0;
@@ -77,19 +78,28 @@ byte LoRaNowClass::loop()
       state_change(state);
     }
   }
+
+  if (isSleep())
+  {
+    if (LoRaNow.sleepCallback)
+    {
+      LoRaNow.sleepCallback();
+    }
+    else
+    {
+      LoRaNow.receive();
+    }
+  }
+
   return 1;
 }
 
 void LoRaNowClass::state_change(byte _state, unsigned long _wait)
 {
-  static unsigned long tempo = 0;
-
   wait = _wait;
   state = _state;
   if (wait == 0)
   {
-    if (state == LORA_STATE_TX_DONE)
-      tempo = time;
     state_do(state);
   }
 }
@@ -130,6 +140,15 @@ void LoRaNowClass::state_do(byte _state)
   case LORA_STATE_RX1_WAIT:
   case LORA_STATE_SLEEP:
     sleep();
+    break;
+  case LORA_STATE_RECEIVE:
+    if (LoRaNow.messageCallback)
+    {
+      LoRaNow.messageCallback((uint8_t *)LoRaNow.buffer(), LoRaNow.available());
+    }
+    LoRaNow.clear();
+    if (state != LORA_STATE_TX_WAIT)
+      state_change(LORA_STATE_SLEEP);
     break;
   }
 }
@@ -234,7 +253,7 @@ void LoRaNowClass::gateway(bool gateway)
 {
   _gateway = gateway;
   rxwindow = 0;
-  state_change(LORA_STATE_RX1);
+  //state_change(LORA_STATE_RX1);
 }
 
 void LoRaNowClass::setId(uint32_t _id)
@@ -258,8 +277,8 @@ uint32_t LoRaNowClass::makeId()
 #elif defined(ARDUINO_ARCH_ESP8266)
   return ESP.getChipId();
 #elif defined(ARDUINO_ARCH_ESP32)
-  uint32_t _id = (uint32_t) ((uint64_t)ESP.getEfuseMac()>>16);
-  return ((((_id) & 0xff000000) >> 24) | (((_id) & 0x00ff0000) >>  8) | (((_id) & 0x0000ff00) << 8) | (((_id) & 0x000000ff) << 24)); // swap bits
+  uint32_t _id = (uint32_t)((uint64_t)ESP.getEfuseMac() >> 16);
+  return ((((_id)&0xff000000) >> 24) | (((_id)&0x00ff0000) >> 8) | (((_id)&0x0000ff00) << 8) | (((_id)&0x000000ff) << 24)); // swap bits
 #endif
   return 0;
 }
@@ -519,8 +538,13 @@ void LoRaNowClass::rxMode()
   LoRa.receive();
 }
 
+void LoRaNowClass::receive()
+{
+  state_change(LORA_STATE_RX1);
+}
+
 // ---------------------------------------------------- //
-// LoRa
+// callback
 // ---------------------------------------------------- //
 
 void LoRaNowClass::onMessage(void (*cb)(uint8_t *payload, size_t size))
@@ -528,9 +552,19 @@ void LoRaNowClass::onMessage(void (*cb)(uint8_t *payload, size_t size))
   messageCallback = cb;
 }
 
+void LoRaNowClass::onSleep(void (*cb)())
+{
+  sleepCallback = cb;
+}
+
+// ---------------------------------------------------- //
+// LoRa
+// ---------------------------------------------------- //
+
 void LoRaNowClass::onReceive(int packetSize)
 {
   LORANOW_DEBUG_PRINTLN("[ln] Receive");
+  LoRaNow.time = millis();
   LoRaNow.beginDecode();
   while (LoRa.available())
   {
@@ -538,16 +572,13 @@ void LoRaNowClass::onReceive(int packetSize)
   }
   if (LoRaNow.endDecode())
   {
-    if (LoRaNow.messageCallback)
-    {
-      LoRaNow.messageCallback((uint8_t *)LoRaNow.buffer(), LoRaNow.available());
-    }
+    LoRaNow.state_change(LORA_STATE_RECEIVE, LORANOW_WAIT_RECEIVE);
   }
   else
   {
     LoRa.receive();
+    LoRaNow.clear();
   }
-  LoRaNow.clear();
 }
 
 void LoRaNowClass::onTxDone()

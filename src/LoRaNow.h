@@ -1,4 +1,4 @@
-// ---------------------------------------------------- //
+﻿// ---------------------------------------------------- //
 // LoRaNow.h
 // ---------------------------------------------------- //
 // Data: 18/09/2018
@@ -42,6 +42,7 @@
 #define LORANOW_PROTOCOL 0x27
 #define LORANOW_BUF_SIZE 128
 #define LORANOW_WAIT_READY 2000
+#define LORANOW_WAIT_RECEIVE 100
 
 #if defined(ARDUINO_ARCH_ESP32)
 // HELTEC
@@ -67,8 +68,12 @@
 
 #define LORANOW_DEFAULT_SF 7
 
-#if defined(ARDUINO_AVR_LORANOW)
+#if defined(ARDUINO_AVR_LORANOW_V1)
 #define LORANOW_MOSFET_P 9
+#endif
+
+#if defined(ARDUINO_AVR_LORANOW_V0)
+#define LORANOW_MOSFET_P 8
 #endif
 
 struct LoRaNowLayer
@@ -100,6 +105,7 @@ enum LoRa_State
 	LORA_STATE_RX1_WAIT,
 	LORA_STATE_RX1,
 	LORA_STATE_RX1_DONE,
+	LORA_STATE_RECEIVE,
 };
 
 // ---------------------------------------------------- //
@@ -117,7 +123,7 @@ class LoRaNowClass : public Stream
 
 	// ----------------------------------------------- //
 	// 	State machine
-	uint8_t state = 0;
+	
 	unsigned int wait = 0;
 	unsigned long time = 0;
 	// ----------------------------------------------- //
@@ -134,6 +140,9 @@ class LoRaNowClass : public Stream
 	uint8_t payload_position = 0;
 	// ----------------------------------------------- //
   public:
+
+	uint8_t state = 0;
+
 	LoRaNowClass();
 
 	byte begin();
@@ -141,8 +150,6 @@ class LoRaNowClass : public Stream
 	void sleep();
 	void end();
 
-	bool isSleep();
-	bool isReady();
 	void delay(long _millis);
 
 	void showStatus(Stream &out);
@@ -170,6 +177,7 @@ class LoRaNowClass : public Stream
 	virtual void flush();
 
 	void send();
+	void receive();
 
 	void clear();
 	uint8_t *buffer();
@@ -178,14 +186,19 @@ class LoRaNowClass : public Stream
 	int32_t read24();
 	int32_t read32();
 
+	void onMessage(void (*cb)(uint8_t *payload, size_t size));
+	void onSleep(void (*cb)());
+
+  private:
+
+	bool isSleep();
+	bool isReady();
+
 	int beginPacket();
 	int endPacket();
 
 	size_t sendPacket(const uint8_t *buffer, size_t size);
 
-	void onMessage(void (*cb)(uint8_t *payload, size_t size));
-
-  private:
 	uint32_t makeId();
 
 	// ----------------------------------------------- //
@@ -201,6 +214,7 @@ class LoRaNowClass : public Stream
 	int endDecode();
 
 	void (*messageCallback)(uint8_t *payload, size_t size);
+	void (*sleepCallback)();
 
 	byte calcCheckSum(byte *packege, byte length);
 
