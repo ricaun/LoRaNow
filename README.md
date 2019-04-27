@@ -4,6 +4,13 @@ LoRaNow is a open source communication protocol to make easier to understand the
 
 This library was design using the [Arduino LoRa](https://github.com/sandeepmistry/arduino-LoRa) Library by [Sandeep Mistry](https://github.com/sandeepmistry).
 
+## Features 
+
+* Hardware Compatibility - Compatible with Arduino and ESP boards with a LoRa module attached.
+* Id - Each node has an identification, by default the library creates a unique id for the node. 
+* Checksum - Each payload has a checksum to verify if the data is corrupted.
+* State Machine - The library has a state machine algorithm to manage the LoRa module, open an RX window after sending data and put the module to sleep. 
+
 ## Compatible Hardware
 
 The main focus hardware is Arduino and ESP boards with [RFM95W](http://www.hoperf.com/rf_transceiver/lora/RFM95W.html) LoRa module.
@@ -23,7 +30,7 @@ The default pinout connection is like the table below.
 | DIO0 | 2 | gpio15 | gpio26 |
 
 
-`SS`, and `DIO0` pins can be changed by using `LoRaNow.setPins(ss, dio0)`. `DIO0` pin is needed, it **must** be interrupt capable via [`attachInterrupt(...)`](https://www.arduino.cc/en/Reference/AttachInterrupt).
+`SS`, and `DIO0` pins can be changed by using `LoRaNow.setPins(ss, dio0)` or `LoRaNow.setPinsSPI(sck, miso, mosi, ss, dio0)`. `DIO0` pin is needed, it **must** be interrupt capable via [`attachInterrupt(...)`](https://www.arduino.cc/en/Reference/AttachInterrupt).
 
 # Ferquency
 
@@ -44,14 +51,11 @@ This is the payload format, this protocol don't have any kind of encryption.
 | :-------: | :------: | :------:| :------:| :------:| :------:|
 | 1 Byte | 4 Bytes | 1 Byte | 1 Byte | 1 Byte | N Bytes |
 
-# State Machine
-
-`TO DO`
 
 ## Installation
 
 * Install the library by [Using the Library Manager](https://www.arduino.cc/en/Guide/Libraries#toc3)
-* **OR** by [Importing the .zip library](https://www.arduino.cc/en/Guide/Libraries#toc4) using either the [master](https://github.com/ricaun/LoRaNow/archive/1.0.1.zip) or one of the [releases](https://github.com/ricaun/LoRaNow/releases) ZIP files.
+* **OR** by [Importing the .zip library](https://www.arduino.cc/en/Guide/Libraries#toc4) using either the [master](https://github.com/ricaun/LoRaNow/archive/1.0.4.zip) or one of the [releases](https://github.com/ricaun/LoRaNow/releases) ZIP files.
 
 ## Examples
 
@@ -63,7 +67,7 @@ See [API.md](API.md).
 
 ## License
 
-This libary is [licensed](LICENSE) under the [MIT Licence](https://en.wikipedia.org/wiki/MIT_License).
+This library is [licensed](LICENSE) under the [MIT Licence](https://en.wikipedia.org/wiki/MIT_License).
 
 ## To do
 
@@ -71,5 +75,9 @@ This libary is [licensed](LICENSE) under the [MIT Licence](https://en.wikipedia.
 - [x] Example for ESP32 board
 - [ ] Improve documentation
 - [ ] State machine
+
+----
+
+See news and other projects on my [blog](http://loranow.com)
 
 Do you like this library? Please [star this project on GitHub](https://github.com/ricaun/LoRaNow/stargazers)!
