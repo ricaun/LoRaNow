@@ -1,9 +1,9 @@
 /*
-  LoRaNow Simple Gateway with ESP32
+  LoRaNow Simple Gateway with ESP32 setPins
 
   This code creates a webServer to show the LoRa messages.
   
-  created 05 04 2019
+  created 27 04 2019
   by Luiz H. Cassettari
 */
 
@@ -11,6 +11,12 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <StreamString.h>
+
+#define SCK 5
+#define MISO 19
+#define MOSI 27
+#define SS 18
+#define DIO0 26
 
 const char *ssid = "";
 const char *password = "";
@@ -86,7 +92,7 @@ void setup(void)
   // LoRaNow.setSpreadingFactor(sf);
   // LoRaNow.setPins(ss, dio0);
 
-  // LoRaNow.setPinsSPI(sck, miso, mosi, ss, dio0); // Only works with ESP32
+  LoRaNow.setPinsSPI(SCK, MISO, MOSI, SS, DIO0); // Only works with ESP32
 
   if (!LoRaNow.begin())
   {

@@ -22,6 +22,8 @@ void setup() {
   // LoRaNow.setSpreadingFactor(sf);
   // LoRaNow.setPins(ss, dio0);
 
+  // LoRaNow.setPinsSPI(sck, miso, mosi, ss, dio0); // Only works with ESP32
+
   if (!LoRaNow.begin()) {
     Serial.println("LoRa init failed. Check your connections.");
     while (true);

@@ -27,6 +27,21 @@ LoRaNow.setPins(ss, dio0);
 
 This call is optional and only needs to be used if you need to change the default pins used.
 
+### Set pins SPI
+
+Override the SPI pins and the default `SS`, and `DIO0` pins used by the library. **Must** be called before `LoRaNow.begin()`.
+
+```c
+LoRaNow.setPinsSPI(sck, miso, mosi, ss, dio0);
+```
+ * `sck` - new sck pin to use for SPI communication
+ * `miso` - new miso pin to use for SPI communication
+ * `mosi` - new mosi pin to use for SPI communication
+ * `ss` - new slave select pin to use, defaults to `10` or `gpio16`
+ * `dio0` - new DIO0 pin to use, defaults to `2` or `gpio15`.  **Must** be interrupt capable via [attachInterrupt(...)](https://www.arduino.cc/en/Reference/AttachInterrupt).
+
+This call is optional and only works on ESP32 platform.
+
 ### End
 
 Stop the library

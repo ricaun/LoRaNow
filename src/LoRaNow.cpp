@@ -1,6 +1,8 @@
 // ---------------------------------------------------- //
 // LoRaNow.cpp
 // ---------------------------------------------------- //
+// 27/04/2019 - Add setPinsSPI to help esp32 boards
+// 24/04/2019 - Fix LoRaNow board mosfet
 // 23/04/2019 - Add onSleep callback
 // 22/04/2019 - Add LORA_STATE_RECEIVE on loop - fix interrupt reset on esp32/esp8266
 // 20/04/2019 - Fix esp32 id
@@ -46,7 +48,7 @@ byte LoRaNowClass::begin()
 #if defined(LORANOW_MOSFET_P)
   pinMode(LORANOW_MOSFET_P, OUTPUT);
   digitalWrite(LORANOW_MOSFET_P, LOW);
-  delay(1);
+  delay(5);
 #endif
 
   if (LoRa.begin(frequency))
@@ -64,6 +66,10 @@ byte LoRaNowClass::begin()
     LoRa.onTxDone(LoRaNowClass::onTxDone);
     sleep();
     return 1;
+  }
+  else 
+  {
+    LORANOW_DEBUG_PRINTLN("[ln] Begin Fail");
   }
   return 0;
 }
@@ -109,7 +115,8 @@ void LoRaNowClass::state_do(byte _state)
   switch (_state)
   {
   case LORA_STATE_INIT:
-    begin();
+    if (!begin())
+      state = LORA_STATE_END;
     break;
   case LORA_STATE_END:
     end();
@@ -212,6 +219,15 @@ void LoRaNowClass::showStatus(Stream &out)
   }
 }
 
+void LoRaNowClass::setPinsSPI(int sck, int miso, int mosi, int ss, int dio0)
+{
+#if defined(ARDUINO_ARCH_AVR)
+#elif defined(ARDUINO_ARCH_ESP8266)
+#elif defined(ARDUINO_ARCH_ESP32)
+  SPI.begin(sck, miso, mosi, ss);
+#endif
+  setPins(ss, dio0);
+}
 void LoRaNowClass::setPins(int ss, int dio0)
 {
   _ss = ss;
@@ -326,16 +342,16 @@ int LoRaNowClass::peek()
 
 void LoRaNowClass::flush()
 {
-
-  if (state == LORA_STATE_NONE)
+  LORANOW_DEBUG_PRINT("[ln] flush ");
+  LORANOW_DEBUG_PRINTLN(state);
+  if (state == LORA_STATE_NONE || state == LORA_STATE_END)
   {
     state_change(LORA_STATE_INIT);
   }
-  if (state == LORA_STATE_END)
+  if (state == LORA_STATE_SLEEP || state == LORA_STATE_RECEIVE)
   {
-    state_change(LORA_STATE_INIT);
+    state_change(LORA_STATE_TX_INIT);
   }
-  state_change(LORA_STATE_TX_INIT);
 }
 
 void LoRaNowClass::send()

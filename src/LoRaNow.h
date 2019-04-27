@@ -45,15 +45,8 @@
 #define LORANOW_WAIT_RECEIVE 100
 
 #if defined(ARDUINO_ARCH_ESP32)
-// HELTEC
 #define LORANOW_DEFAULT_SS_PIN 18
 #define LORANOW_DEFAULT_DIO0_PIN 26
-
-#if defined(ARDUINO_MH_ET_LIVE_ESP32MINIKIT)
-#define LORANOW_DEFAULT_SS_PIN 26
-#define LORANOW_DEFAULT_DIO0_PIN 5
-#endif
-
 #elif defined(ARDUINO_ARCH_ESP8266)
 #define LORANOW_DEFAULT_SS_PIN 16
 #define LORANOW_DEFAULT_DIO0_PIN 15
@@ -123,7 +116,7 @@ class LoRaNowClass : public Stream
 
 	// ----------------------------------------------- //
 	// 	State machine
-	
+
 	unsigned int wait = 0;
 	unsigned long time = 0;
 	// ----------------------------------------------- //
@@ -140,7 +133,6 @@ class LoRaNowClass : public Stream
 	uint8_t payload_position = 0;
 	// ----------------------------------------------- //
   public:
-
 	uint8_t state = 0;
 
 	LoRaNowClass();
@@ -154,6 +146,7 @@ class LoRaNowClass : public Stream
 
 	void showStatus(Stream &out);
 
+	void setPinsSPI(int sck, int miso, int mosi, int ss = LORA_DEFAULT_SS_PIN, int dio0 = LORA_DEFAULT_DIO0_PIN);
 	void setPins(int ss = LORA_DEFAULT_SS_PIN, int dio0 = LORA_DEFAULT_DIO0_PIN);
 
 	void setFrequency(long _frequency);
@@ -190,7 +183,6 @@ class LoRaNowClass : public Stream
 	void onSleep(void (*cb)());
 
   private:
-
 	bool isSleep();
 	bool isReady();
 
