@@ -85,6 +85,13 @@
 #define MAP_DIO3_LORA_NOP       0x03
 
 
+#ifdef ESP8266 || ESP32
+    #define ISR_PREFIX ICACHE_RAM_ATTR
+#else
+    #define ISR_PREFIX
+#endif
+
+
 LoRaClass::LoRaClass() :
   _spiSettings(LORA_DEFAULT_SPI_FREQUENCY, MSBFIRST, SPI_MODE0),
   _spi(&LORA_DEFAULT_SPI),
@@ -762,7 +769,7 @@ uint8_t LoRaClass::singleTransfer(uint8_t address, uint8_t value)
   return response;
 }
 
-void LoRaClass::onDio0Rise()
+ISR_PREFIX void LoRaClass::onDio0Rise()
 {
   LoRa.handleDio0Rise();
 }
@@ -806,7 +813,7 @@ void LoRaClass::receiveCAD()
   writeRegister(REG_OP_MODE, MODE_LONG_RANGE_MODE | MODE_CAD);
 }
 
-void LoRaClass::onCADRise()
+ISR_PREFIX void LoRaClass::onCADRise()
 {
   LoRa.handleCADRise();
 }

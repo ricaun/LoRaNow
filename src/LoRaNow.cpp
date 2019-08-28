@@ -1,6 +1,7 @@
 // ---------------------------------------------------- //
 // LoRaNow.cpp
 // ---------------------------------------------------- //
+// 28/08/2019 - esp32 interrupt fatal erro add ICACHE_RAM_ATTR
 // 27/04/2019 - Add setPinsSPI to help esp32 boards
 // 24/04/2019 - Fix LoRaNow board mosfet
 // 23/04/2019 - Add onSleep callback
@@ -36,6 +37,12 @@
 #endif
 #endif
 
+#ifdef ESP8266 || ESP32
+    #define ISR_PREFIX ICACHE_RAM_ATTR
+#else
+    #define ISR_PREFIX
+#endif
+
 LoRaNowClass::LoRaNowClass()
 {
   setTimeout(0);
@@ -61,6 +68,7 @@ byte LoRaNowClass::begin()
       randomSeed(seed);
       now_id = makeId();
     }
+	
     LORANOW_DEBUG_PRINTLN("[ln] Begin");
     LoRa.onReceive(LoRaNowClass::onReceive);
     LoRa.onTxDone(LoRaNowClass::onTxDone);
@@ -141,7 +149,6 @@ void LoRaNowClass::state_do(byte _state)
       state_change(LORA_STATE_RX1_DONE, rxwindow);
     break;
   case LORA_STATE_RX1_DONE:
-    //state_change(LORA_STATE_END);
     state_change(LORA_STATE_SLEEP);
     break;
   case LORA_STATE_RX1_WAIT:
@@ -269,7 +276,6 @@ void LoRaNowClass::gateway(bool gateway)
 {
   _gateway = gateway;
   rxwindow = 0;
-  //state_change(LORA_STATE_RX1);
 }
 
 void LoRaNowClass::setId(uint32_t _id)
@@ -509,13 +515,6 @@ int LoRaNowClass::endPacket()
   return 0;
 }
 
-size_t LoRaNowClass::sendPacket(const uint8_t *buffer, size_t size)
-{
-  LoRaNow.beginPacket();
-  LoRaNow.write(buffer, size);
-  return LoRaNow.endPacket();
-}
-
 byte LoRaNowClass::calcCheckSum(byte *packege, byte length)
 {
   byte sum = 0;
@@ -528,6 +527,7 @@ byte LoRaNowClass::calcCheckSum(byte *packege, byte length)
 
 void LoRaNowClass::txMode()
 {
+  LORANOW_DEBUG_PRINTLN("[ln] txMode");
   LoRa.idle();
   LoRa.setFrequency(frequency);
   LoRa.setSpreadingFactor(sf);
@@ -577,7 +577,7 @@ void LoRaNowClass::onSleep(void (*cb)())
 // LoRa
 // ---------------------------------------------------- //
 
-void LoRaNowClass::onReceive(int packetSize)
+ISR_PREFIX void LoRaNowClass::onReceive(int packetSize)
 {
   LORANOW_DEBUG_PRINTLN("[ln] Receive");
   LoRaNow.time = millis();
@@ -597,7 +597,7 @@ void LoRaNowClass::onReceive(int packetSize)
   }
 }
 
-void LoRaNowClass::onTxDone()
+ISR_PREFIX void LoRaNowClass::onTxDone()
 {
   LORANOW_DEBUG_PRINTLN("[ln] txDone");
   LoRaNow.time = millis();

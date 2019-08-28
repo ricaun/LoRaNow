@@ -188,9 +188,7 @@ class LoRaNowClass : public Stream
 
 	int beginPacket();
 	int endPacket();
-
-	size_t sendPacket(const uint8_t *buffer, size_t size);
-
+	
 	uint32_t makeId();
 
 	// ----------------------------------------------- //
