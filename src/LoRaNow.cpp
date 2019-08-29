@@ -156,13 +156,25 @@ void LoRaNowClass::state_do(byte _state)
     sleep();
     break;
   case LORA_STATE_RECEIVE:
-    if (LoRaNow.messageCallback)
+    LoRaNow.beginDecode();
+    while (LoRa.available())
     {
-      LoRaNow.messageCallback((uint8_t *)LoRaNow.buffer(), LoRaNow.available());
+      LoRaNow.write(LoRa.read());
+    }
+    if (LoRaNow.endDecode())
+    {
+      if (LoRaNow.messageCallback)
+      {
+        LoRaNow.messageCallback((uint8_t *)LoRaNow.buffer(), LoRaNow.available());
+      }
+      if (state != LORA_STATE_TX_WAIT)
+        state_change(LORA_STATE_SLEEP);
+    }
+    else
+    {
+      LoRa.receive();
     }
     LoRaNow.clear();
-    if (state != LORA_STATE_TX_WAIT)
-      state_change(LORA_STATE_SLEEP);
     break;
   }
 }
@@ -581,20 +593,7 @@ ISR_PREFIX void LoRaNowClass::onReceive(int packetSize)
 {
   LORANOW_DEBUG_PRINTLN("[ln] Receive");
   LoRaNow.time = millis();
-  LoRaNow.beginDecode();
-  while (LoRa.available())
-  {
-    LoRaNow.write(LoRa.read());
-  }
-  if (LoRaNow.endDecode())
-  {
-    LoRaNow.state_change(LORA_STATE_RECEIVE, LORANOW_WAIT_RECEIVE);
-  }
-  else
-  {
-    LoRa.receive();
-    LoRaNow.clear();
-  }
+  LoRaNow.state_change(LORA_STATE_RECEIVE, LORANOW_WAIT_RECEIVE);
 }
 
 ISR_PREFIX void LoRaNowClass::onTxDone()
