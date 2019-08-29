@@ -167,14 +167,14 @@ void LoRaNowClass::state_do(byte _state)
       {
         LoRaNow.messageCallback((uint8_t *)LoRaNow.buffer(), LoRaNow.available());
       }
-      if (state != LORA_STATE_TX_WAIT)
-        state_change(LORA_STATE_SLEEP);
     }
     else
     {
       LoRa.receive();
     }
     LoRaNow.clear();
+    if (state != LORA_STATE_TX_WAIT)
+        state_change(LORA_STATE_SLEEP);
     break;
   }
 }
