@@ -7,7 +7,7 @@
 #######################################
 
 LoRaNow	KEYWORD1
-LoRaNowLayer KEYWORD1
+LoRaNowLayer	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
