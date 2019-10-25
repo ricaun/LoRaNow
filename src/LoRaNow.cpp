@@ -389,6 +389,7 @@ void LoRaNowClass::clear()
 {
   payload_len = 0;
   payload_position = 0;
+  memset(payload_buf, 0, LORANOW_BUF_SIZE);
 }
 
 unsigned int LoRaNowClass::readInt()
