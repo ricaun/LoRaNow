@@ -600,7 +600,7 @@ ISR_PREFIX void LoRaNowClass::onTxDone()
 {
   LORANOW_DEBUG_PRINTLN("[ln] txDone");
   LoRaNow.time = millis();
-  LoRaNow.state_change(LORA_STATE_TX_DONE);
+  LoRaNow.state_change(LORA_STATE_TX_DONE, LORANOW_WAIT_TXDONE);
 }
 
 LoRaNowClass LoRaNow;
