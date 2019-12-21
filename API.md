@@ -90,7 +90,7 @@ LoRaNow.send();
 
 #### Register callback
 
-### onMessege
+### onMessage
 
 Register a callback function for when a valid payload is received.
 
