@@ -123,9 +123,10 @@ class LoRaNowClass : public Stream
 	// ----------------------------------------------- //
 
 	bool _gateway = false;
+	bool _countcheckdecode = true;
 
 	uint32_t now_id = 0;
-	uint8_t _count = 0;
+	uint8_t now_count = 0;
 
 	// ----------------------------------------------- //
 	// 	buffer
@@ -178,6 +179,8 @@ class LoRaNowClass : public Stream
 	virtual int peek();
 	virtual void flush();
 
+	void send(uint32_t _id, uint8_t count);
+	void send(uint32_t _id);
 	void send();
 	void receive();
 

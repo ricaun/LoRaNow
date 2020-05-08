@@ -55,7 +55,7 @@ This is the payload format, this protocol don't have any kind of encryption.
 ## Installation
 
 * Install the library by [Using the Library Manager](https://www.arduino.cc/en/Guide/Libraries#toc3)
-* **OR** by [Importing the .zip library](https://www.arduino.cc/en/Guide/Libraries#toc4) using either the [master](https://github.com/ricaun/LoRaNow/archive/1.0.5.zip) or one of the [releases](https://github.com/ricaun/LoRaNow/releases) ZIP files.
+* **OR** by [Importing the .zip library](https://www.arduino.cc/en/Guide/Libraries#toc4) using either the [master](https://github.com/ricaun/LoRaNow/archive/1.0.6.zip) or one of the [releases](https://github.com/ricaun/LoRaNow/releases) ZIP files.
 
 ## Examples
 

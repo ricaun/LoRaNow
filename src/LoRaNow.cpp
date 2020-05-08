@@ -1,9 +1,12 @@
 // ---------------------------------------------------- //
 // LoRaNow.cpp
 // ---------------------------------------------------- //
+// 08/05/2020 - Example rx and tx
+// 08/05/2020 - Add rxwindow - disable checkcount
 // 08/05/2020 - remove LoRa.h random
 // 08/05/2020 - remove LoRa.h interrupt bug (esp32 error)
 // 08/05/2020 - Add Node options
+// 10/12/2019 - add time delay txdone
 // 28/08/2019 - esp32 interrupt fatal erro add ICACHE_RAM_ATTR
 // 27/04/2019 - Add setPinsSPI to help esp32 boards
 // 24/04/2019 - Fix LoRaNow board mosfet
@@ -167,7 +170,7 @@ void LoRaNowClass::state_do(byte _state)
     break;
   case LORA_STATE_RX1_WAIT:
   case LORA_STATE_SLEEP:
-    sleep();
+      sleep();
     break;
   case LORA_STATE_RECEIVE:
     LoRaNow.beginDecode();
@@ -189,6 +192,7 @@ void LoRaNowClass::state_do(byte _state)
     LoRaNow.clear();
     if (state != LORA_STATE_TX_WAIT)
       state_change(LORA_STATE_SLEEP);
+      
     break;
   }
 }
@@ -240,10 +244,10 @@ void LoRaNowClass::showStatus(Stream &out)
   out.print("Frequecy: ");
   out.println(frequency);
 
-  if (_count)
+  if (now_count)
   {
     out.print("Count: ");
-    out.println(_count);
+    out.println(now_count);
   }
   if (available())
   {
@@ -315,12 +319,13 @@ void LoRaNowClass::setId(uint32_t _id)
 
 void LoRaNowClass::setCount(uint8_t count)
 {
-  _count = count;
+  now_count = count;
 }
 
 void LoRaNowClass::setRxWindow(unsigned int rx)
 {
   rxwindow = rx;
+  _countcheckdecode = (rx != 0);
 }
 
 uint32_t LoRaNowClass::makeId()
@@ -348,7 +353,7 @@ uint32_t LoRaNowClass::id()
 
 uint8_t LoRaNowClass::count()
 {
-  return _count;
+  return now_count;
 }
 
 size_t LoRaNowClass::write(uint8_t c)
@@ -390,10 +395,29 @@ void LoRaNowClass::flush()
   {
     state_change(LORA_STATE_INIT);
   }
-  if (state == LORA_STATE_SLEEP || state == LORA_STATE_RECEIVE)
+  if (state == LORA_STATE_SLEEP || state == LORA_STATE_RECEIVE || state == LORA_STATE_RX1)
   {
     state_change(LORA_STATE_TX_INIT);
   }
+}
+
+void LoRaNowClass::send(uint32_t _id, uint8_t count)
+{
+  if (_id != 0 && _gateway == true)
+  {
+    now_id = _id;
+    now_count = count;
+  }
+  flush();
+}
+
+void LoRaNowClass::send(uint32_t _id)
+{
+  if (_id != 0 && _gateway == true)
+  {
+    now_id = _id;
+  }
+  flush();
 }
 
 void LoRaNowClass::send()
@@ -487,9 +511,9 @@ int LoRaNowClass::endDecode()
       if (LoRaNow._gateway == true)
       {
         now_id = _LORA_ID_TO_INT32(ln->id);
-        _count = ln->count;
+        now_count = ln->count;
       }
-      else if (_LORA_ID_TO_INT32(ln->id) != now_id || _count != ln->count)
+      else if (_LORA_ID_TO_INT32(ln->id) != now_id || (now_count != ln->count && _countcheckdecode))
       {
         LORANOW_DEBUG_PRINTLN("[ln] Id / Count Error");
         return 0;
@@ -520,11 +544,11 @@ int LoRaNowClass::beginPacket()
 
   if (LoRaNow._gateway == false)
   {
-    _count++;
+    now_count++;
   }
   ln->protocol = LORANOW_PROTOCOL;
   _LORA_INT32_TO_ID(ln->id, now_id);
-  ln->count = _count;
+  ln->count = now_count;
   ln->checksum = 0;
   return 0;
 }

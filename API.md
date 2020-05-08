@@ -82,7 +82,7 @@ Returns the number of bytes written.
 
 ### Send
 
-Send the payload buffer to the LoRa Module.
+Send the payload buffer to the LoRa Module. It's possible to send directy to a node, check the gateway section.
 
 ```c
 LoRaNow.send();
@@ -195,12 +195,20 @@ This function defines the board to work like a gateway, this means always listen
 LoRaNow.gateway();
 ```
 
-### Code Rx Window
+#### Send to Node
 
-The node has a rx Window to wait the response of a gateway, defaults is 3000 millisecond.
+Send to a expecific node id, the node need to have the `setRxWindow()` enable to infinite.
 
 ```c
-LoRaNow.setRxWindow(); // Infinit Rx Window
+LoRaNow.send(id); 
+```
+
+#### Code Rx Window
+
+The node has a rx Window to wait the response of a gateway, defaults is 2000 millisecond.
+
+```c
+LoRaNow.setRxWindow(); // Infinite Rx Window
 ```
 
 ```c
