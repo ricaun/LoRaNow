@@ -1,6 +1,9 @@
 // ---------------------------------------------------- //
 // LoRaNow.cpp
 // ---------------------------------------------------- //
+// 08/05/2020 - remove LoRa.h random
+// 08/05/2020 - remove LoRa.h interrupt bug (esp32 error)
+// 08/05/2020 - Add Node options
 // 28/08/2019 - esp32 interrupt fatal erro add ICACHE_RAM_ATTR
 // 27/04/2019 - Add setPinsSPI to help esp32 boards
 // 24/04/2019 - Fix LoRaNow board mosfet
@@ -38,9 +41,9 @@
 #endif
 
 #ifdef ESP8266 || ESP32
-    #define ISR_PREFIX ICACHE_RAM_ATTR
+#define ISR_PREFIX ICACHE_RAM_ATTR
 #else
-    #define ISR_PREFIX
+#define ISR_PREFIX
 #endif
 
 LoRaNowClass::LoRaNowClass()
@@ -63,19 +66,19 @@ byte LoRaNowClass::begin()
     if (state == LORA_STATE_NONE)
     {
       LoRa.receive();
-      uint32_t seed = (uint32_t)LoRa.random() << 24 | (uint32_t)LoRa.random() << 16 | (uint32_t)LoRa.random() << 8 | (uint32_t)LoRa.random();
+      uint32_t seed = (uint32_t)random() << 24 | (uint32_t)random() << 16 | (uint32_t)random() << 8 | (uint32_t)random();
       LoRa.sleep();
       randomSeed(seed);
       now_id = makeId();
     }
-	
+
     LORANOW_DEBUG_PRINTLN("[ln] Begin");
     LoRa.onReceive(LoRaNowClass::onReceive);
     LoRa.onTxDone(LoRaNowClass::onTxDone);
     sleep();
     return 1;
   }
-  else 
+  else
   {
     LORANOW_DEBUG_PRINTLN("[ln] Begin Fail");
   }
@@ -106,6 +109,17 @@ byte LoRaNowClass::loop()
   }
 
   return 1;
+}
+
+byte LoRaNowClass::random()
+{
+  static byte result = 0;
+  for (int i = 0; i < 8; i++)
+  {
+    result = (result << 1) | (result >> 7); // Spread randomness around / rotate left
+    result ^= LoRa.random();                // XOR preserves randomness
+  }
+  return result;
 }
 
 void LoRaNowClass::state_change(byte _state, unsigned long _wait)
@@ -174,7 +188,7 @@ void LoRaNowClass::state_do(byte _state)
     }
     LoRaNow.clear();
     if (state != LORA_STATE_TX_WAIT)
-        state_change(LORA_STATE_SLEEP);
+      state_change(LORA_STATE_SLEEP);
     break;
   }
 }
@@ -297,6 +311,16 @@ void LoRaNowClass::setId(uint32_t _id)
     _id = makeId();
   }
   now_id = _id;
+}
+
+void LoRaNowClass::setCount(uint8_t count)
+{
+  _count = count;
+}
+
+void LoRaNowClass::setRxWindow(unsigned int rx)
+{
+  rxwindow = rx;
 }
 
 uint32_t LoRaNowClass::makeId()

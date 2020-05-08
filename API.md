@@ -182,6 +182,10 @@ The count number, always increment by one when a message is send.
 ```c
 byte count = LoRaNow.count();
 ```
+
+```c
+LoRaNow.setCount(count);
+```
  
 ### Gateway
 
@@ -189,4 +193,16 @@ This function defines the board to work like a gateway, this means always listen
 
 ```c
 LoRaNow.gateway();
+```
+
+### Code Rx Window
+
+The node has a rx Window to wait the response of a gateway, defaults is 3000 millisecond.
+
+```c
+LoRaNow.setRxWindow(); // Infinit Rx Window
+```
+
+```c
+LoRaNow.setRxWindow(3000); // 3000 millisecond
 ```

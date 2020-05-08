@@ -140,6 +140,9 @@ class LoRaNowClass : public Stream
 
 	byte begin();
 	byte loop();
+
+	byte random();
+
 	void sleep();
 	void end();
 
@@ -160,6 +163,11 @@ class LoRaNowClass : public Stream
 
 	void gateway(bool gateway = true);
 	void setId(uint32_t _id = 0);
+	
+	// node options
+	void setCount(uint8_t count = 0);
+	void setRxWindow(unsigned int rx = 0);
+
 	uint32_t id();
 	uint8_t count();
 

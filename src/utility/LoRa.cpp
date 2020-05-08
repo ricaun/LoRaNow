@@ -659,12 +659,7 @@ void LoRaClass::setOCP(uint8_t mA)
 
 byte LoRaClass::random()
 {
-  static byte result = 0;
-  for(int i = 0; i < 8; i++) {
-    result = (result << 1) | (result >> 7); // Spread randomness around / rotate left 
-    result ^= readRegister(REG_RSSI_WIDEBAND); // XOR preserves randomness
-  }
-  return result;
+  return readRegister(REG_RSSI_WIDEBAND);
 }
 
 void LoRaClass::setPins(int ss, int reset, int dio0)
@@ -711,7 +706,7 @@ void LoRaClass::implicitHeaderMode()
 void LoRaClass::handleDio0Rise()
 {
   int irqFlags = readRegister(REG_IRQ_FLAGS);
-  //Serial.println(irqFlags, HEX);
+
   // clear IRQ's
   writeRegister(REG_IRQ_FLAGS, irqFlags);
 
@@ -730,11 +725,7 @@ void LoRaClass::handleDio0Rise()
       if (_onReceive) {
         _onReceive(packetLength);
       }
-
-      // reset FIFO address
-      writeRegister(REG_FIFO_ADDR_PTR, 0);
     }
-
     else if ((irqFlags & IRQ_TX_DONE_MASK) != 0) {
       if (_onTxDone) {
         _onTxDone();

@@ -16,7 +16,10 @@ LoRaNowLayer	KEYWORD1
 setId	KEYWORD2
 id	KEYWORD2
 gateway	KEYWORD2
+setCount	KEYWORD2
 count	KEYWORD2
+
+setRxWindow	KEYWORD2
 
 begin	KEYWORD2
 end	KEYWORD2
